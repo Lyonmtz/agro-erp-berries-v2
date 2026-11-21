@@ -1,0 +1,143 @@
+import os
+from typing import AsyncGenerator
+
+import pytest
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
+
+from app.core.database import get_db
+from app.main import app
+
+
+class DisposableTestDBGuardError(RuntimeError):
+    """Error lanzado cuando se intenta correr una suite destructiva sin verificar BD desechable."""
+
+
+async def verify_disposable_test_db(
+    database_url: str,
+    allow_destructive_env: str | None = None,
+) -> str:
+    """
+    Guarda estricta para suites destructivas:
+    Exige DOS condiciones simultaneas y NUNCA infiere desechabilidad por el nombre de la BD:
+      1) Variable ALLOW_DESTRUCTIVE_TEST_DB == 'true'
+      2) Verificacion real en PostgreSQL:
+         SELECT db_environment FROM app_db_metadata WHERE id = 1  == 'DISPOSABLE_TEST'
+    """
+    flag = (
+        allow_destructive_env
+        if allow_destructive_env is not None
+        else os.getenv("ALLOW_DESTRUCTIVE_TEST_DB", "")
+    )
+    if flag.strip().lower() != "true":
+        raise DisposableTestDBGuardError(
+            "ABORTADO: ALLOW_DESTRUCTIVE_TEST_DB debe estar explicitamente en 'true' "
+            "para ejecutar pruebas destructivas."
+        )
+
+    if not database_url:
+        raise DisposableTestDBGuardError(
+            "ABORTADO: TEST_DATABASE_URL no configurada."
+        )
+
+    probe_engine: AsyncEngine = create_async_engine(database_url, poolclass=NullPool)
+    try:
+        async with probe_engine.connect() as conn:
+            result = await conn.execute(
+                text("SELECT db_environment FROM app_db_metadata WHERE id = 1")
+            )
+            env_value = result.scalar()
+    except Exception as exc:
+        raise DisposableTestDBGuardError(
+            f"ABORTADO: No se pudo verificar app_db_metadata.db_environment en la BD destino: {exc}"
+        ) from exc
+    finally:
+        await probe_engine.dispose()
+
+    if env_value != "DISPOSABLE_TEST":
+        raise DisposableTestDBGuardError(
+            f"ABORTADO: La BD destino reporta db_environment={env_value!r}; "
+            "se requiere explicitamente 'DISPOSABLE_TEST' en app_db_metadata. "
+            "Nunca se asume desechabilidad por nombre de base."
+        )
+
+    return env_value
+
+
+def get_verified_test_database_url() -> str:
+    url = os.getenv("TEST_DATABASE_URL", "").strip()
+    if not url:
+        raise DisposableTestDBGuardError(
+            "ABORTADO: Define TEST_DATABASE_URL apuntando exclusivamente a una base desechable verificada."
+        )
+    return url
+
+
+@pytest_asyncio.fixture
+async def verified_test_engine() -> AsyncGenerator[AsyncEngine, None]:
+    test_url = get_verified_test_database_url()
+    await verify_disposable_test_db(test_url)
+
+    engine = create_async_engine(test_url, poolclass=NullPool)
+    try:
+        yield engine
+    finally:
+        await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def db_session(verified_test_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
+    """
+    Sesion limpia sobre la base desechable verificada.
+    Al terminar cada prueba, restaura tablas operativas transaccionales y el estado
+    de lotes modificados sin tocar los seeds base.
+    """
+    session_factory = async_sessionmaker(
+        verified_test_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+    async with session_factory() as session:
+        try:
+            yield session
+        finally:
+            await session.rollback()
+            # Limpieza destructiva controlada (solo posible tras pasar verify_disposable_test_db)
+            await verify_disposable_test_db(get_verified_test_database_url())
+            await session.execute(text("DELETE FROM aplicaciones_fitosanitarias"))
+            await session.execute(text("DELETE FROM insumos_agricolas WHERE codigo LIKE 'TEST-%'"))
+            await session.execute(text("DELETE FROM registros_cosecha"))
+            await session.execute(text("DELETE FROM registros_labores_culturales"))
+            await session.execute(text("DELETE FROM prenomina_diaria"))
+            await session.execute(text("DELETE FROM jornadas_diarias"))
+            await session.execute(text("DELETE FROM resultados_evaluaciones"))
+            await session.execute(text("DELETE FROM acuses_digitales"))
+            await session.execute(text("DELETE FROM empleados WHERE numero_empleado LIKE 'TEST-%'"))
+            await session.execute(text("DELETE FROM candidatos"))
+            await session.execute(
+                text(
+                    """
+                    UPDATE lotes_produccion
+                       SET estatus_fitosanitario = CASE WHEN activo THEN 'LIBRE_CORTE' ELSE 'CERRADO' END,
+                           fecha_liberacion_corte = NULL
+                    """
+                )
+            )
+            await session.commit()
+
+
+@pytest_asyncio.fixture
+async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
+    async def _override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _override_get_db
+    transport = ASGITransport(app=app)
+    try:
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+            yield client
+    finally:
+        app.dependency_overrides.clear()

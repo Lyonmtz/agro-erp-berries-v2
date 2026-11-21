@@ -1,9 +1,25 @@
-import os
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://agro_admin:DevPassword2026!@db:5432/agro_berries_erp")
-engine = create_async_engine(DATABASE_URL, echo=False, pool_size=20, max_overflow=10)
-AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+from app.core.config import settings
+
+
+class Base(DeclarativeBase):
+    """Base declarativa SQLAlchemy 2.0 para modelos ORM y Alembic."""
+
+
+engine = create_async_engine(
+    settings.database_url,
+    echo=False,
+    pool_size=20,
+    max_overflow=10,
+)
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
 
 async def get_db():
     async with AsyncSessionLocal() as session:

@@ -324,4 +324,3 @@ INSERT INTO reglas_pago_tarifas (nombre_regla, cultivo_id, labor_id, modalidad_p
 ('Cosecha Arándano Destajo 2026', 2, 1, 'DESTAJO_PURO', 0.00, 28.00, 0.00, 28.00, 2.50, 2.50, '2026-01-01', 'SYSTEM_INIT'),
 ('Cosecha Fresa Mixta 2026', 3, 1, 'MIXTO_GARANTIA', 330.00, 0.00, 18.00, 19.00, 4.00, 1.50, '2026-01-01', 'SYSTEM_INIT'),
 ('Poda General Jornal 2026', NULL, 2, 'JORNAL_PURO', 340.00, 0.00, 6.00, 0.00, 0.00, 0.00, '2026-01-01', 'SYSTEM_INIT');
-echo "✅ Scripts SQL guardados correctamente"
