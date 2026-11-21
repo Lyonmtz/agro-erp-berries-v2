@@ -117,6 +117,15 @@ async def db_session(verified_test_engine: AsyncEngine) -> AsyncGenerator[AsyncS
             await session.execute(text("DELETE FROM acuses_digitales"))
             await session.execute(text("DELETE FROM empleados WHERE numero_empleado LIKE 'TEST-%'"))
             await session.execute(text("DELETE FROM candidatos"))
+            # Limpieza controlada de tablas transaccionales/test de Fase 3B
+            await session.execute(text("DELETE FROM prenomina_semanal_detalle"))
+            await session.execute(text("DELETE FROM prenomina_semanal"))
+            await session.execute(text("DELETE FROM campo_traslados_cajas"))
+            await session.execute(text("DELETE FROM campo_movilidad_personas"))
+            await session.execute(text("DELETE FROM campo_culturales_diarios"))
+            await session.execute(text("DELETE FROM campo_capturas_cosecha"))
+            await session.execute(text("DELETE FROM campo_cierres_operativos"))
+            await session.execute(text("DELETE FROM campo_autorizaciones_operativas"))
             # Limpieza controlada de tablas transaccionales/test de Fase 2
             await session.execute(text("DELETE FROM merqry_exports_nomina"))
             await session.execute(text("DELETE FROM merqry_staging_empleados"))

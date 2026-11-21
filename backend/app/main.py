@@ -14,11 +14,13 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.modules.auth_usuarios.router import router as auth_router
 from app.modules.core_org.router import router as org_router
+from app.modules.cosecha_tablet.router import router as cosecha_router
 from app.modules.documentos.router import router as docs_router
 from app.modules.identidad.router import router as identidad_router
 from app.modules.merqry_sync.router import router as merqry_router
 from app.modules.operacion_campo.router import router as campo_router
 from app.modules.personal.router import router as personal_router
+from app.modules.prenomina.router import router as prenomina_router
 from app.modules.reclutamiento.router import router as reclutamiento_router
 from app.modules.sync_offline.router import router as sync_router
 from app.modules.trasplante_recepcion.router import router as trasplante_router
@@ -43,6 +45,8 @@ app.include_router(merqry_router)
 app.include_router(sync_router)
 app.include_router(campo_router)
 app.include_router(trasplante_router)
+app.include_router(cosecha_router)
+app.include_router(prenomina_router)
 
 
 class PostulacionIn(BaseModel):
