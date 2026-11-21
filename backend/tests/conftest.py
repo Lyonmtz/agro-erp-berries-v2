@@ -117,6 +117,21 @@ async def db_session(verified_test_engine: AsyncEngine) -> AsyncGenerator[AsyncS
             await session.execute(text("DELETE FROM acuses_digitales"))
             await session.execute(text("DELETE FROM empleados WHERE numero_empleado LIKE 'TEST-%'"))
             await session.execute(text("DELETE FROM candidatos"))
+            # Limpieza controlada de tablas transaccionales/test de Fase 1
+            await session.execute(text("DELETE FROM etl_cuarentena_identidad"))
+            await session.execute(text("DELETE FROM etl_lotes_migracion"))
+            await session.execute(text("DELETE FROM funciones_operativas_temporales"))
+            await session.execute(text("DELETE FROM documentos_entidad"))
+            await session.execute(text("DELETE FROM nips_personal"))
+            await session.execute(text("DELETE FROM auditoria_universal"))
+            await session.execute(text("DELETE FROM codigos_alternativos WHERE codigo_externo LIKE 'TEST-%' OR descripcion LIKE '%ETL%' OR descripcion LIKE '%canónica de persona%'"))
+            await session.execute(text("DELETE FROM localizaciones_fisicas WHERE clave LIKE 'TEST-%'"))
+            await session.execute(text("DELETE FROM unidades_operativas WHERE clave LIKE 'TEST-%'"))
+            await session.execute(text("DELETE FROM sucursales WHERE clave LIKE 'TEST-%'"))
+            await session.execute(text("DELETE FROM relaciones_laborales WHERE numero_empleado LIKE 'TEST-%' OR numero_empleado LIKE 'ETL-%'"))
+            await session.execute(text("DELETE FROM personas WHERE curp LIKE 'TEST%' OR curp LIKE 'ETLP%'"))
+            await session.execute(text("DELETE FROM usuarios_roles WHERE usuario_id IN (SELECT id FROM usuarios WHERE username LIKE 'test.%')"))
+            await session.execute(text("DELETE FROM usuarios WHERE username LIKE 'test.%'"))
             await session.execute(
                 text(
                     """

@@ -36,6 +36,8 @@ services:
       - ./database/02_schema_campo_pagos.sql:/docker-entrypoint-initdb.d/02_schema_campo_pagos.sql:ro
       - ./database/03_seed_data.sql:/docker-entrypoint-initdb.d/03_seed_data.sql:ro
       - ./database/04_schema_tec_inv_log.sql:/docker-entrypoint-initdb.d/04_schema_tec_inv_log.sql:ro
+      - ./database/05_schema_fase1_core_org_auth_docs.sql:/docker-entrypoint-initdb.d/05_schema_fase1_core_org_auth_docs.sql:ro
+      - ./database/06_seed_fase1_org_rbac.sql:/docker-entrypoint-initdb.d/06_seed_fase1_org_rbac.sql:ro
       - ./database_test_init/99_mark_disposable_test.sql:/docker-entrypoint-initdb.d/99_mark_disposable_test.sql:ro
     ports:
       - "${TEST_POSTGRES_HOST_PORT:-5436}:5432"

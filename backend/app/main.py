@@ -12,6 +12,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.modules.auth_usuarios.router import router as auth_router
+from app.modules.core_org.router import router as org_router
+from app.modules.documentos.router import router as docs_router
+from app.modules.identidad.router import router as identidad_router
 from app.services.pagos_service import MotorPagosCampo
 from app.services.psicometria_service import MotorPsicometrico
 
@@ -23,6 +27,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth_router)
+app.include_router(org_router)
+app.include_router(docs_router)
+app.include_router(identidad_router)
 
 
 class PostulacionIn(BaseModel):
