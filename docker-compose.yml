@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: agro_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agro_admin
+      POSTGRES_PASSWORD: DevPassword2026!
+      POSTGRES_DB: agro_berries_erp
+      TZ: America/Mexico_City
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agro_admin -d agro_berries_erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: agro_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://agro_admin:DevPassword2026!@db:5432/agro_berries_erp
+      SECRET_KEY: DevSecretKey_Berries_2026
+      TZ: America/Mexico_City
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
