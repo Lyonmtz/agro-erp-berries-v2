@@ -16,6 +16,9 @@ from app.modules.auth_usuarios.router import router as auth_router
 from app.modules.core_org.router import router as org_router
 from app.modules.documentos.router import router as docs_router
 from app.modules.identidad.router import router as identidad_router
+from app.modules.operacion_campo.router import router as campo_router
+from app.modules.sync_offline.router import router as sync_router
+from app.modules.trasplante_recepcion.router import router as trasplante_router
 from app.services.pagos_service import MotorPagosCampo
 from app.services.psicometria_service import MotorPsicometrico
 
@@ -31,6 +34,9 @@ app.include_router(auth_router)
 app.include_router(org_router)
 app.include_router(docs_router)
 app.include_router(identidad_router)
+app.include_router(sync_router)
+app.include_router(campo_router)
+app.include_router(trasplante_router)
 
 
 class PostulacionIn(BaseModel):

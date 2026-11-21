@@ -38,6 +38,7 @@ services:
       - ./database/04_schema_tec_inv_log.sql:/docker-entrypoint-initdb.d/04_schema_tec_inv_log.sql:ro
       - ./database/05_schema_fase1_core_org_auth_docs.sql:/docker-entrypoint-initdb.d/05_schema_fase1_core_org_auth_docs.sql:ro
       - ./database/06_seed_fase1_org_rbac.sql:/docker-entrypoint-initdb.d/06_seed_fase1_org_rbac.sql:ro
+      - ./database/07_schema_fase3a_trasplante_sync.sql:/docker-entrypoint-initdb.d/07_schema_fase3a_trasplante_sync.sql:ro
       - ./database_test_init/99_mark_disposable_test.sql:/docker-entrypoint-initdb.d/99_mark_disposable_test.sql:ro
     ports:
       - "${TEST_POSTGRES_HOST_PORT:-5436}:5432"
