@@ -41,6 +41,7 @@ services:
       - ./database/07_schema_fase3a_trasplante_sync.sql:/docker-entrypoint-initdb.d/07_schema_fase3a_trasplante_sync.sql:ro
       - ./database/08_schema_fase2_rh_merqry.sql:/docker-entrypoint-initdb.d/08_schema_fase2_rh_merqry.sql:ro
       - ./database/09_schema_fase3b_cosecha_culturales_prenomina.sql:/docker-entrypoint-initdb.d/09_schema_fase3b_cosecha_culturales_prenomina.sql:ro
+      - ./database/10_schema_merqry_writer_outbox.sql:/docker-entrypoint-initdb.d/10_schema_merqry_writer_outbox.sql:ro
       - ./database_test_init/99_mark_disposable_test.sql:/docker-entrypoint-initdb.d/99_mark_disposable_test.sql:ro
     ports:
       - "${TEST_POSTGRES_HOST_PORT:-5436}:5432"
@@ -65,6 +66,8 @@ services:
       ALLOW_DESTRUCTIVE_TEST_DB: ${ALLOW_DESTRUCTIVE_TEST_DB:-false}
       SECRET_KEY: ${SECRET_KEY:-DevSecretKey_Berries_2026}
       MERQRY_READONLY_MODE: "true"
+      MERQRY_WRITE_ENABLED: "false"
+      MERQRY_WRITE_MODE: "DISABLED"
       TZ: ${TZ:-America/Mexico_City}
     volumes:
       - ./backend:/app

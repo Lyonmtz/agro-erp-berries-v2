@@ -18,6 +18,7 @@ from app.modules.cosecha_tablet.router import router as cosecha_router
 from app.modules.documentos.router import router as docs_router
 from app.modules.identidad.router import router as identidad_router
 from app.modules.merqry_sync.router import router as merqry_router
+from app.modules.merqry_writer.router import router as merqry_writer_router
 from app.modules.operacion_campo.router import router as campo_router
 from app.modules.personal.router import router as personal_router
 from app.modules.prenomina.router import router as prenomina_router
@@ -42,6 +43,7 @@ app.include_router(identidad_router)
 app.include_router(reclutamiento_router)
 app.include_router(personal_router)
 app.include_router(merqry_router)
+app.include_router(merqry_writer_router)
 app.include_router(sync_router)
 app.include_router(campo_router)
 app.include_router(trasplante_router)
@@ -102,6 +104,7 @@ async def health_check(db: AsyncSession = Depends(get_db)):
         "cultivos_activos": res.scalar(),
         "db_environment": env_res.scalar(),
         "merqry_mode": "READ_ONLY" if settings.merqry_readonly_mode else "INVALID",
+        "merqry_write_enabled": settings.merqry_write_enabled,
     }
 
 
