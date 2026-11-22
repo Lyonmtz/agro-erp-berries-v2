@@ -20,6 +20,10 @@ htmlcov/
 uploads/
 *.log
 
+# Frontend / Node
+node_modules/
+frontend/dist/
+
 # IDE / OS
 .vscode/
 .idea/

@@ -1,0 +1,18 @@
+{
+  "name": "AGRO-ERP Berries v2",
+  "short_name": "Berries ERP",
+  "description": "Operación de campo offline-first (Cosecha, Culturales, Trasplante) y Panel Oficina NFA/BIO",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#064e3b",
+  "theme_color": "#064e3b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
