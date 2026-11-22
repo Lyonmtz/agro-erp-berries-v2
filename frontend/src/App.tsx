@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  BarChart3,
   Building2,
   CloudOff,
   Database,
@@ -10,6 +11,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { apiRequest } from "./api/client";
+import { ExecutiveFinanceView } from "./components/ExecutiveFinanceView";
 import { FieldTabletView } from "./components/FieldTabletView";
 import { LoginView } from "./components/LoginView";
 import { OfficePanelView } from "./components/OfficePanelView";
@@ -35,7 +37,7 @@ import type {
 
 const SESSION_KEY = "agro_erp_berries_session_v2";
 
-type MainTab = "tablet" | "outbox" | "office";
+type MainTab = "tablet" | "outbox" | "office" | "finance";
 
 export function App() {
   const [session, setSession] = useState<AuthSession | null>(() => {
@@ -272,6 +274,17 @@ export function App() {
               <Building2 className="w-4 h-4" />
               Panel Oficina &amp; Merqry
             </button>
+            <button
+              onClick={() => setActiveTab("finance")}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition whitespace-nowrap ${
+                activeTab === "finance"
+                  ? "border-amber-400 text-white"
+                  : "border-transparent text-emerald-200 hover:text-white"
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Finanzas &amp; Auditoría
+            </button>
           </div>
         </div>
       </header>
@@ -296,6 +309,9 @@ export function App() {
           />
         )}
         {activeTab === "office" && <OfficePanelView session={session} catalogs={catalogs} />}
+        {activeTab === "finance" && (
+          <ExecutiveFinanceView session={session} catalogs={catalogs} />
+        )}
       </main>
     </div>
   );

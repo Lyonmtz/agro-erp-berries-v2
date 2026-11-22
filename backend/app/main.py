@@ -16,6 +16,7 @@ from app.modules.auth_usuarios.router import router as auth_router
 from app.modules.core_org.router import router as org_router
 from app.modules.cosecha_tablet.router import router as cosecha_router
 from app.modules.documentos.router import router as docs_router
+from app.modules.finanzas_auditoria.router import router as finanzas_router
 from app.modules.identidad.router import router as identidad_router
 from app.modules.merqry_sync.router import router as merqry_router
 from app.modules.merqry_writer.router import router as merqry_writer_router
@@ -49,6 +50,7 @@ app.include_router(campo_router)
 app.include_router(trasplante_router)
 app.include_router(cosecha_router)
 app.include_router(prenomina_router)
+app.include_router(finanzas_router)
 
 
 class PostulacionIn(BaseModel):

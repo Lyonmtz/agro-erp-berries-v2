@@ -42,6 +42,7 @@ services:
       - ./database/08_schema_fase2_rh_merqry.sql:/docker-entrypoint-initdb.d/08_schema_fase2_rh_merqry.sql:ro
       - ./database/09_schema_fase3b_cosecha_culturales_prenomina.sql:/docker-entrypoint-initdb.d/09_schema_fase3b_cosecha_culturales_prenomina.sql:ro
       - ./database/10_schema_merqry_writer_outbox.sql:/docker-entrypoint-initdb.d/10_schema_merqry_writer_outbox.sql:ro
+      - ./database/11_schema_fase4_finanzas_auditoria.sql:/docker-entrypoint-initdb.d/11_schema_fase4_finanzas_auditoria.sql:ro
       - ./database_test_init/99_mark_disposable_test.sql:/docker-entrypoint-initdb.d/99_mark_disposable_test.sql:ro
     ports:
       - "${TEST_POSTGRES_HOST_PORT:-5436}:5432"
